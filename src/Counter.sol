@@ -35,6 +35,10 @@ contract Raffle {
 
     /** Variables */
     uint256 private immutable i_entranceFee;
+    address payable[] private s_players; // these addresses are payable
+
+    /** Events */
+    event RaffleEntered(address indexed player);
 
     /** Constructor */
     constructor(uint256 entranceFee) {
@@ -48,6 +52,11 @@ contract Raffle {
         if (msg.value < i_entranceFee) {
             revert Raffle__SendMoreToEnterRaffle();
         }
+        s_players.push(payable(msg.sender)); // these addresses are payable
+
+        // 1. Makes migration easier
+        // 2. Makes front end "indexing" easier
+        emit RaffleEntered(msg.sender);
     }
 
     function pickWinner() public {}
