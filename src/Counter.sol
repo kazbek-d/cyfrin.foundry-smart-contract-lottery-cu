@@ -35,18 +35,23 @@ contract Raffle {
 
     /** Variables */
     uint256 private immutable i_entranceFee;
+    // @dev The duration of the lottery in seconds
+    uint256 private immutable i_interval;
     address payable[] private s_players; // these addresses are payable
+    uint256 private s_lastTimeStamp;
 
     /** Events */
     event RaffleEntered(address indexed player);
 
     /** Constructor */
-    constructor(uint256 entranceFee) {
+    constructor(uint256 entranceFee, uint256 interval) {
         i_entranceFee = entranceFee;
+        i_interval = interval;
+        s_lastTimeStamp = block.timestamp;
     }
 
     /** Contract's logic */
-    function enterRaffle() public payable {
+    function enterRaffle() external payable {
         // require(msg.value >= i_entranceFee, "Not enough ETH sent!");
         // require(msg.value >= i_entranceFee, Raffle__SendMoreToEnterRaffle());
         if (msg.value < i_entranceFee) {
@@ -59,7 +64,15 @@ contract Raffle {
         emit RaffleEntered(msg.sender);
     }
 
-    function pickWinner() public {}
+    // 1. Get a random number
+    // 2. Use random number to pick a player
+    // 3. Be automatically called
+    function pickWinner() external {
+        // check to see if enough time is passed
+        if ((block.timestamp - s_lastTimeStamp) < i_interval) {
+            revert();
+        }
+    }
 
     /** Getter Functions */
     function get_entranceFee() external view returns (uint256) {
