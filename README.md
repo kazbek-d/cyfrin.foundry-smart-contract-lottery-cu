@@ -11,14 +11,21 @@ Foundry consists of:
 
 ## Documentation
 
-https://book.getfoundry.sh/
+- https://book.getfoundry.sh/
+
+- Request testnet LINK and ETH here: https://faucets.chain.link/
+- Find information on LINK Token Contracts and get the latest ETH and LINK faucets here:
+- - https://docs.chain.link/docs/link-token-contracts/
+- - https://docs.chain.link/vrf/v2-5/getting-started
+ 
 
 ## Usage
 
 ### Init (in case of start new development from scratch)
 
 ```shell
-$ fforge init --force
+$ forge init --force
+$ forge install smartcontractkit/chainlink-brownie-contracts@1.1.1 --no-commit
 ```
 
 ### Build
