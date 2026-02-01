@@ -37,6 +37,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
     error Raffle__SendMoreToEnterRaffle();
     error Raffle__TransferFailed();
     error Raffle__RaffleNotOpen();
+    error Raffle__RaffleUpkeepNotNeeded(
+        uint256 balance,
+        uint256 playersLength,
+        uint256 raffleState
+    );
 
     /** Type declarations */
     enum RaffleState {
@@ -115,17 +120,12 @@ contract Raffle is VRFConsumerBaseV2Plus {
         emit RaffleEntered(msg.sender);
     }
 
+    /** switch from public pickWinner to Chainlink Automation: checkUpkeep & performUpkeep */
     // 1. Get a random number
     // 2. Use random number to pick a player
     // 3. Be automatically called
-    function pickWinner() external {
-        // check to see if enough time is passed
-        if ((block.timestamp - s_lastTimeStamp) < i_interval) {
-            revert();
-        }
-
+    function pickWinner() private {
         s_raffleState = RaffleState.CALCULATING;
-
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient
             .RandomWordsRequest({
                 keyHash: i_keyHash,
@@ -138,8 +138,48 @@ contract Raffle is VRFConsumerBaseV2Plus {
                     VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
                 )
             });
-
         uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
+    }
+
+    /**
+     * @dev This is the function that the Chainlink nodes will call to see
+     * if the lottery is ready to have a winner picked.
+     * The following should be true in order for upkeepNeeded to be true:
+     * 1. The time interval has passed between raffle runs
+     * 2. The lottery is open
+     * 3. The contract has ETH (has players)
+     * 4. Implcitly, your subscription has LINK
+     * @param - ignored
+     * @return upkeepNeeded
+     * @return - ignored
+     */
+    function checkUpkeep(
+        bytes memory /* checkData */
+    ) public view returns (bool upkeepNeeded, bytes memory /* performData */) {
+        bool timeHasPassed = (block.timestamp - s_lastTimeStamp) >= i_interval;
+        bool isOpen = s_raffleState == RaffleState.OPEN;
+        bool hasBalance = address(this).balance > 0;
+        bool hasPlayers = s_players.length > 0;
+
+        upkeepNeeded = timeHasPassed && isOpen && hasBalance && hasPlayers;
+
+        /** No need to return anything, it's only for code-readability.
+         * the syntactic sugar was used: returns (bool upkeepNeeded, bytes memory performData )
+         */
+        return (upkeepNeeded, "");
+    }
+
+    function performUpkeep(bytes calldata /* performData */) external {
+        (bool upkeepNeeded, ) = checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert Raffle__RaffleUpkeepNotNeeded(
+                address(this).balance,
+                s_players.length,
+                uint256(s_raffleState)
+            );
+        }
+
+        pickWinner();
     }
 
     /**
