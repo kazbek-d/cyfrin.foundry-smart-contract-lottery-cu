@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
 import {Raffle} from "src/Raffle.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
@@ -35,5 +35,25 @@ contract RaffleTest is Test {
 
     function testRaffleInitializesInOpenState() public view {
         assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN);
+    }
+
+    function testRaffleRevertsWhenYouDontPayEnough() public {
+        // Arrange
+        vm.prank(PLAYAR);
+
+        // Act / Assert
+        vm.expectRevert(Raffle.Raffle__SendMoreToEnterRaffle.selector);
+        raffle.enterRaffle();
+    }
+
+    function testRaffleRecordsPlayersWhenTheyEnter() public {
+        // Arrange
+        vm.prank(PLAYAR);
+
+        // Act
+        raffle.enterRaffle{value: entranceFee}();
+
+        // Assert
+        assert(raffle.getPlayer(0) == PLAYAR);
     }
 }
