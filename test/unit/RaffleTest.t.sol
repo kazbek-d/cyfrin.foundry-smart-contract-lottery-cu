@@ -20,6 +20,10 @@ contract RaffleTest is Test {
     address public PLAYAR = makeAddr("player");
     uint256 public constant STARTING_PLAYER_BALANCE = 10 ether;
 
+    /** Events (copy/past from Raffre Contract) */
+    event RaffleEntered(address indexed player);
+    event WinnerPicked(address indexed winner);
+
     function setUp() external {
         DeployRaffle deployRaffle = new DeployRaffle();
         (raffle, helperConfig) = deployRaffle.deployRaffle();
@@ -55,5 +59,34 @@ contract RaffleTest is Test {
 
         // Assert
         assert(raffle.getPlayer(0) == PLAYAR);
+    }
+
+    /**   forge test --mt testEnteringRaffleEmitsEvent -vvvv   */
+    function testEnteringRaffleEmitsEvent() public {
+        // Arrange
+        vm.prank(PLAYAR);
+
+        // Act
+        vm.expectEmit(true, false, false, false, address(raffle));
+        emit RaffleEntered(PLAYAR);
+
+        // Assert
+        raffle.enterRaffle{value: entranceFee}();
+    }
+
+    /**   forge test --mt testDontAllowPlayersToEnterWhileRaffleIsCalculating -vvvv   */
+    function testDontAllowPlayersToEnterWhileRaffleIsCalculating() public {
+        // Arrange
+        vm.prank(PLAYAR);
+        raffle.enterRaffle{value: entranceFee}();
+        vm.warp(block.timestamp + raffle.getInterval() + 1);
+        vm.roll(block.number + 1);
+        // TODO: Bug here. [FAIL: InvalidConsumer(0, 0x90193C961A926261B756D1E5bb255e67ff9498A1)]
+        raffle.performUpkeep("");
+
+        // Act / Assert
+        vm.expectRevert(Raffle.Raffle__RaffleNotOpen.selector);
+        vm.prank(PLAYAR);
+        raffle.enterRaffle{value: entranceFee}();
     }
 }
