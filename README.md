@@ -77,6 +77,7 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+instead of cast sig "..." you can check it in https://4byte.sourcify.dev/
 
 ### Tests
 1. Write deploy scripts
