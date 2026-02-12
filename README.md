@@ -27,6 +27,8 @@ Foundry consists of:
 $ forge init --force
 $ forge install smartcontractkit/chainlink-brownie-contracts@1.1.1 --no-commit
 $ forge install transmissions11/solmate@v6
+[Cyfrin/foundry-devops](https://github.com/Cyfrin/foundry-devops)
+$ forge install Cyfrin/foundry-devops
 ```
 
 ### Build

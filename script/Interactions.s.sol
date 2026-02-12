@@ -5,6 +5,8 @@ import {Script, console} from "forge-std/Script.sol";
 import {HelperConfig, CodeConstants} from "script/HelperConfig.s.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {LinkToken} from "test/mocks/LinkToken.sol";
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
+import {Raffle} from "src/Raffle.sol";
 
 contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256, address) {
@@ -71,5 +73,38 @@ contract FundSubscription is Script, CodeConstants {
 
     function run() public {
         fundSubscriptionUsingConfig();
+    }
+}
+
+contract AddConsumer is Script {
+    function addConsumerUsingConfig(address mostRecentlyDeployed) public {
+        HelperConfig helperConfig = new HelperConfig();
+        address vrfCoordinator = helperConfig.getConfig().vrfCoordinator;
+        uint256 subscriptionId = helperConfig.getConfig().subscriptionId;
+        addConsumer(mostRecentlyDeployed, vrfCoordinator, subscriptionId);
+    }
+
+    function addConsumer(
+        address contractTioAddToVrf,
+        address vrfCoordinator,
+        uint256 subscriptionId
+    ) public {
+        console.log("Adding consumer contract: ", contractTioAddToVrf);
+        console.log("To VrfCoordinator: ", vrfCoordinator);
+        console.log("On ChainId: ", block.chainid);
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(
+            subscriptionId,
+            contractTioAddToVrf
+        );
+        vm.stopBroadcast();
+    }
+
+    function run() public {
+        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
+            "Raffle",
+            block.chainid
+        );
+        addConsumerUsingConfig(mostRecentlyDeployed);
     }
 }
