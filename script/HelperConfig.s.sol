@@ -29,6 +29,7 @@ contract HelperConfig is Script, CodeConstants {
         uint256 subscriptionId;
         uint32 callbackGasLimit;
         address link;
+        address account;
     }
 
     NetworkConfig public localNetworkConfig;
@@ -70,7 +71,8 @@ contract HelperConfig is Script, CodeConstants {
                 subscriptionId: 37657085714280262738899934828961110139692795897403924412869829954891826744208,
                 callbackGasLimit: 500000,
                 // https://docs.chain.link/resources/link-token-contracts
-                link: 0x779877A7B0D9E8603169DdbD7836e478b4624789
+                link: 0x779877A7B0D9E8603169DdbD7836e478b4624789,
+                account: 0x8512af8A8eAD7deE9d9F451a0f8C4876faE72BF1
             });
     }
 
@@ -98,7 +100,9 @@ contract HelperConfig is Script, CodeConstants {
             gasLine: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
             subscriptionId: 0, // might have to fix this
             callbackGasLimit: 500000,
-            link: address(linkToken)
+            link: address(linkToken),
+            // Get it from  /lib/forge-std/src/Base.sol: DEFAULT_SENDER
+            account: 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
         });
 
         return localNetworkConfig;

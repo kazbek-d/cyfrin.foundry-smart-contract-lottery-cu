@@ -4,11 +4,11 @@ pragma solidity ^0.8.19;
 import {Test, console} from "forge-std/Test.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
 import {Raffle} from "src/Raffle.sol";
-import {HelperConfig} from "script/HelperConfig.s.sol";
+import {HelperConfig, CodeConstants} from "script/HelperConfig.s.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 
-contract RaffleTest is Test {
+contract RaffleTest is Test, CodeConstants {
     Raffle public raffle;
     HelperConfig public helperConfig;
 
@@ -81,6 +81,13 @@ contract RaffleTest is Test {
         raffle.enterRaffle{value: entranceFee}();
         vm.warp(block.timestamp + raffle.getInterval() + 1);
         vm.roll(block.number + 1);
+        _;
+    }
+
+    modifier skipFork() {
+        if (block.chainid != LOCAL_CHAIN_ID) {
+            return;
+        }
         _;
     }
 
@@ -179,7 +186,7 @@ contract RaffleTest is Test {
     /**   FUZZ Test   */
     function testFullfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(
         uint256 requestId
-    ) public raffleEntered {
+    ) public raffleEntered skipFork {
         // Arrange / Act / Assert
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(
@@ -189,9 +196,11 @@ contract RaffleTest is Test {
     }
 
     /**   forge test --mt testFullfillRandomWordsPicksAWinnerResetAndSendsMoney -vvvv   */
+    /**   forge test --mt testFullfillRandomWordsPicksAWinnerResetAndSendsMoney --fork-url $SEPOLIA_RPC_URL -vvvv   */
     function testFullfillRandomWordsPicksAWinnerResetAndSendsMoney()
         public
         raffleEntered
+        skipFork
     {
         // Arrange
         uint256 additionalEntrance = 3; // 4 total

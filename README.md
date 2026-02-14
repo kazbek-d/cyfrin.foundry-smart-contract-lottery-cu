@@ -88,4 +88,8 @@ instead of cast sig "..." you can check it in https://4byte.sourcify.dev/
 2. Write Tests
     1. Local chain
     2. Forked testnet
+```shell
+$ forge test --fork-url $SEPOLIA_RPC_URL
+$ forge test --fork-url $SEPOLIA_RPC_URL -vvvv
+```    
     3. Forked mainnet
