@@ -131,6 +131,14 @@ ETHERSCAN_API_KEY=put your data here
 
 without keeping the key in the .env
 $ cast wallet import defaultKey --interactive
+> need to use Private Key for your account for particular Network. To get the private key need to:
+1. go to Metamask 
+2. select the Account
+3. settings "3 dots"
+4. Account Details
+5. Private Keys (Unlock to reveal)
+6. Use you Metamask Password
+7. Select the network .... Account / Private keys ->>> Press Copy Button in the right (next to account)
 > `defaultKey` keystore was saved successfully. Address: 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
 check it ...
 $ cast wallet list
