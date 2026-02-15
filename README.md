@@ -132,6 +132,7 @@ ETHERSCAN_API_KEY=put your data here
 without keeping the key in the .env
 $ cast wallet import defaultKey --interactive
 > need to use Private Key for your account for particular Network. To get the private key need to:
+0. defaultKey - is almost default Network. For other Network use something related to Network, for example: Line Sepolia and so on. This name will be used later in Make File to deploy to specific Network
 1. go to Metamask 
 2. select the Account
 3. settings "3 dots"
