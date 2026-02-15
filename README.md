@@ -82,6 +82,8 @@ $ cast --help
 ```
 instead of cast sig "..." you can check it in https://4byte.sourcify.dev/
 
+
+
 ### Tests
 1. Write deploy scripts
     1. Note, this will not work on zkSync
@@ -93,3 +95,55 @@ $ forge test --fork-url $SEPOLIA_RPC_URL
 $ forge test --fork-url $SEPOLIA_RPC_URL -vvvv
 ```    
     3. Forked mainnet
+
+### Test's Types
+1. Unit Test
+2. Integrations
+3. Forked
+4. Staging <- run tests on a mainnet or testnet
+
+5. Fuzzing
+6. Stateful fuzz
+7. Stateless fuzz
+8. Format verification
+
+### Make
+```shell
+$ make all 
+$ make test 
+$ make clean 
+$ make deploy 
+$ make fund 
+$ make help 
+$ make install 
+$ make snapshot 
+$ make format 
+$ make anvil 
+``` 
+
+```shell
+do not forget to create zou .env file
+RAW_PRIVATE_KEY=put your data here, better to use accounts
+RPC_URL=http://127.0.0.1:8545
+SEPOLIA_RPC_URL=put your data here
+MAINNET_RPC_URL=put your data here
+ETHERSCAN_API_KEY=put your data here 
+
+without keeping the key in the .env
+$ cast wallet import defaultKey --interactive
+> `defaultKey` keystore was saved successfully. Address: 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+check it ...
+$ cast wallet list
+>defaultKey (Local)
+
+
+$ source .env
+$ make help
+> make deploy ARGS="--network sepolia"
+> contract deployed with address 0x66644f18e926caddf4af392a0334753e3d4af83b
+``` 
+
+### connect to chain-link
+1. start from https://faucets.chain.link/
+2. connect your wallet
+3. check the Data & Cross-chain & Compute 
